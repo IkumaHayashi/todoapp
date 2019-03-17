@@ -32,3 +32,8 @@ func (c Task) Update(id int, title string){
 	repo := task.NewTaskRepository()
 	repo.Update(id, title)
 }
+
+func (c Task) Delete(id int){
+	repo := task.NewTaskRepository()
+	repo.Delete(id)
+}

@@ -1,7 +1,7 @@
 package task
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -63,6 +63,13 @@ func (m TaskRepository) Update(id int, title string){
     db.Save(&task)
 }
 
+
+func (m TaskRepository) Delete(id int){
+	task := Task{}
+	db.Find(&task, id)
+	fmt.Println(task);
+    db.Delete(&task)
+}
 
 func (m TaskRepository) GetAll() Tasks {
     var tasks = Tasks{}

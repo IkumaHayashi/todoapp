@@ -1,7 +1,7 @@
 package main
 
 import (
-    //"fmt"
+    "fmt"
     "net/http"
     "strconv"
     "github.com/gin-gonic/gin"
@@ -52,6 +52,15 @@ func main() {
         
         ctrl := task.NewTask()
         ctrl.Update(id, title)
+
+        c.Redirect(http.StatusMovedPermanently, "/")
+    })
+
+    router.POST("/delete", func(c *gin.Context){
+        id, _ := strconv.Atoi(c.PostForm("id"))
+        fmt.Println("delete target id = " + c.PostForm("id"));
+        ctrl := task.NewTask()
+        ctrl.Delete(id)
 
         c.Redirect(http.StatusMovedPermanently, "/")
     })

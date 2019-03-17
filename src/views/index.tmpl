@@ -5,6 +5,7 @@
         <title>{{ .title }}</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
         <style type="text/css" media="screen">
             @import url("/assets/css/site.css");
         </style>
@@ -12,6 +13,8 @@
     <body>
         <div class="container-fluid">
             <h1>{{ .title }}</h1>
+
+            <!--タスク追加Form-->
             <form action="/" method="post">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -20,15 +23,23 @@
                     <input type="text" name="title" class="form-control" placeholder="タスク名" aria-label="..." aria-describedby="button-addon1">
                 </div>
             </form>
-            {{ range .tasks }}
-                <li id="todo_li">
-                    <input type="checkbox" name="task_{{.ID}}" {{if .Done}}checked{{end}}/>
-                    <label id="task_{{.ID}}" name="task_{{.ID}}" >{{ .Title}}</label>
-                </li>
-            {{end}}
 
+            <!--タスク一覧-->
+            <ul class="list-group list-group-flush">
+                {{ range .tasks }}
+                    <li id="todo_li" class="list-group-item">
+                        <input type="checkbox" name="task_{{.ID}}" {{if .Done}}checked{{end}}/>
+                        <label id="task_{{.ID}}" name="task_{{.ID}}" >{{ .Title}}</label>
+                        <button id="task_delete_{{.ID}}" type="button" name="task_delete" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-ban"></i>削除
+                        </button>
+                    </li>
+                {{end}}
+            </ul>
+
+            <!--モーダルウィンドウ表示用-->
             <div id="modal-content" style="display:none">
-                <p>
+                <p> 
                     <h2>Edit Task</h2>
                 </p>
                 <p>
@@ -47,6 +58,7 @@
         </div>
         <script type="text/javascript">
             $(function(){
+                //チェックボックス押下処理
                 $('#todo_li input').click(function () {
                     $.ajax({
                         url:'./changedone',
@@ -57,6 +69,9 @@
                         }
                     });
                 });
+
+
+                //タスク更新処理
                 $('#modal-update').click(function () {
                     let id = $("#modal_task_id").val();
                     console.log("id : " + id + " のデータを更新します");
@@ -78,7 +93,7 @@
                     closeModal();
                 });
 
-
+                //タスク編集処理
                 $('#todo_li label').click(function () {
                     
                     console.log($(this));
@@ -97,10 +112,29 @@
                         closeModal();
 	                });
                 });
+
+                //チェックボックス削除処理
+                $('button[name="task_delete"]').click(function () {
+                    console.log("delete");
+                    console.log($(this).attr("id").split("_")[2]);
+                    let id = $(this).attr("id").split("_")[2];
+                    $.ajax({
+                        url:'./delete',
+                        type:'POST',
+                        data:{
+                            'id': id,
+                        }
+                    });
+                    $(this).parent().remove();
+                });
+
             });
+
+            //モーダルウィンドウ閉じる処理  
             $("#modal-content,#modal-overlay").fadeOut("slow",function(){
                 $("#modal-overlay").remove();
             });
+
 
             function closeModal(){
                 $( "#modal-content,#modal-overlay" ).fadeOut( "slow" , function(){
@@ -108,7 +142,7 @@
                 });
             }
 
-
+            //モーダルウィンドウ中央寄せ
             function centeringModalSyncer() {
 
                 //画面(ウィンドウ)の幅、高さを取得
