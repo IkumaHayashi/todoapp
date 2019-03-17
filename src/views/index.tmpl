@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{ .title }}</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <style type="text/css" media="screen">
+            @import url("/assets/css/site.css");
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <h1>{{ .title }}</h1>
+            <form action="/" method="post">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <button type="submit" class="btn btn-outline-primary">追加</button>
+                    </div>
+                    <input type="text" name="title" class="form-control" placeholder="タスク名" aria-label="..." aria-describedby="button-addon1">
+                </div>
+            </form>
+            {{ range .tasks }}
+                <li id="todo_li">
+                    <input type="checkbox" name="task_{{.ID}}" {{if .Done}}checked{{end}}/>
+                    <label id="task_{{.ID}}" name="task_{{.ID}}" >{{ .Title}}</label>
+                </li>
+            {{end}}
+
+            <div id="modal-content" style="display:none">
+                <p>
+                    <h2>Edit Task</h2>
+                </p>
+                <p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="modal-title" class="form-control" placeholder="タスク名" aria-label="..." aria-describedby="button-addon1">
+                    </div>
+                    <input id="modal_task_id" type="hidden" name="ID" />
+                    
+                </p>
+                <p>
+                    <button id="modal-update" class="btn btn-primary">更新</button>
+                    <button id="modal-close" class="btn btn-secondary">閉じる</button>
+                </p>
+            </div>
+
+        </div>
+        <script type="text/javascript">
+            $(function(){
+                $('#todo_li input').click(function () {
+                    $.ajax({
+                        url:'./changedone',
+                        type:'POST',
+                        data:{
+                            'id':$(this).attr('name').split("_")[1],
+                            'done':$(this).prop("checked")
+                        }
+                    });
+                });
+                $('#modal-update').click(function () {
+                    let id = $("#modal_task_id").val();
+                    console.log("id : " + id + " のデータを更新します");
+                    $.ajax({
+                        url:'./update',
+                        type:'POST',
+                        data:{
+                            'id': id,
+                            'title':$("#modal-title").val()
+                        }
+                    });
+                    console.log($("#task_" + id));
+                    console.log($("#modal-title").text());
+                    console.log($("#modal-title").val());
+                    $("#task_" + id).text($("#modal-title").val());
+                    console.log($("#task_" + id));
+
+
+                    closeModal();
+                });
+
+
+                $('#todo_li label').click(function () {
+                    
+                    console.log($(this));
+                    $("#modal_task_id").val($(this).attr('name').split("_")[1]);
+                    $("#modal-title").val($(this).text());
+
+                    $(this).blur();	//ボタンからフォーカスを外す
+                    if($("#modal-overlay")[0]) $("#modal-overlay").remove() ;
+
+                    $("body").append('<div id="modal-overlay"></div>');
+
+                    $("#modal-overlay").fadeIn("slow");
+                    centeringModalSyncer();
+                    $( "#modal-content" ).fadeIn( "slow" );
+                    $( "#modal-overlay,#modal-close" ).unbind().click( function(){
+                        closeModal();
+	                });
+                });
+            });
+            $("#modal-content,#modal-overlay").fadeOut("slow",function(){
+                $("#modal-overlay").remove();
+            });
+
+            function closeModal(){
+                $( "#modal-content,#modal-overlay" ).fadeOut( "slow" , function(){
+                    $('#modal-overlay').remove();
+                });
+            }
+
+
+            function centeringModalSyncer() {
+
+                //画面(ウィンドウ)の幅、高さを取得
+                var w = $( window ).width() ;
+                var h = $( window ).height() ;
+
+                var cw = $( "#modal-content" ).outerWidth();
+                var ch = $( "#modal-content" ).outerHeight();
+
+                //センタリングを実行する
+                $( "#modal-content" ).css( {"left": ((w - cw)/2) + "px","top": ((h - ch)/2) + "px"} ) ;
+
+            }
+        </script>
+
+    </body>
+</html>

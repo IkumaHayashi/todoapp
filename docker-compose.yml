@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  app:
+    container_name: gin
+    image: golang:1.12.0-alpine
+    volumes:
+      - ./src:/go/src/app
+    command: >
+      sh -c "cd /go/src/app &&
+      apk update &&
+      apk add --no-cache git &&
+      go get -u github.com/codegangsta/gin &&
+      go get -u github.com/golang/dep/cmd/dep &&
+      go get -u github.com/jinzhu/gorm &&
+      dep init ||
+      dep ensure &&
+      gin -i run"
+    ports:
+      - 3001:3001
+  db:
+    build: ./mysql
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: todoapp_db
+      MYSQL_USER: todo_user
+      MYSQL_PASSWORD: todo_user
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3314:3306"
+    volumes:
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./log/mysql:/var/log/mysql
