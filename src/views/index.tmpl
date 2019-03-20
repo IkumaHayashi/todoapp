@@ -21,21 +21,41 @@
                         <button type="submit" class="btn btn-outline-primary">追加</button>
                     </div>
                     <input type="text" name="title" class="form-control" placeholder="タスク名" aria-label="..." aria-describedby="button-addon1">
+                    <input type="date" class="form-control" name="deadline"/>
                 </div>
             </form>
 
             <!--タスク一覧-->
-            <ul class="list-group list-group-flush">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th scope="col">名称</th>
+                        <th>期限</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
                 {{ range .tasks }}
-                    <li id="todo_li" class="list-group-item">
-                        <input type="checkbox" name="task_{{.ID}}" {{if .Done}}checked{{end}}/>
+                <tr>
+                    <td>
+                        <input class="form-control" type="checkbox" name="task_{{.ID}}" {{if .Done}}checked{{end}}/>
+                    </td>
+                    <td>
                         <label id="task_{{.ID}}" name="task_{{.ID}}" >{{ .Title}}</label>
+                    </td>
+                    <td>
+                        <label>{{ .DeadlineDate }}</label>
+                    </td>
+                    <td>
                         <button id="task_delete_{{.ID}}" type="button" name="task_delete" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-ban"></i>削除
                         </button>
-                    </li>
+                    </td>
+                </tr>
                 {{end}}
-            </ul>
+                </tbody>
+            </table>
 
             <!--モーダルウィンドウ表示用-->
             <div id="modal-content" style="display:none">

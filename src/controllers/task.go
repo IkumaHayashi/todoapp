@@ -2,6 +2,7 @@ package task
 
 import(
 	task "app/models"
+	"time"
 )
 
 type Task struct {
@@ -18,9 +19,9 @@ func (c Task) GetAll() interface{} {
     return tasks
 }
 
-func (c Task) Create(title string){
+func (c Task) Create(title string, deadline time.Time){
 	repo := task.NewTaskRepository()
-	repo.Create(title)//
+	repo.Create(title, deadline)//
 }
 
 func (c Task) ChangeDone(id int, done bool){
