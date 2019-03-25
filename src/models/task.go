@@ -32,9 +32,9 @@ func init(){
   
 type Task struct {
 	ID   int    `gorm:"primary_key"`
-	Title string `gorm:"size:140"`
+	Title string `gorm:"size:140" biding:"required"`
 	Done bool
-    DeadlineDate   time.Time `sql:"not null;type:datetime"`
+    DeadlineDate   time.Time `sql:"not null;type:datetime" biding:"required"`
 }
 type TaskRepository struct {
 }

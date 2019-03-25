@@ -42,7 +42,7 @@
                         <input class="form-control" type="checkbox" name="task_{{.ID}}" {{if .Done}}checked{{end}}/>
                     </td>
                     <td>
-                        <label id="task_{{.ID}}" name="task_{{.ID}}" >{{ .Title}}</label>
+                        <label id="task_{{.ID}}" name="task_title_{{.ID}}" >{{ .Title}}</label>
                     </td>
                     <td>
                         <label>{{ .DeadlineDate }}</label>
@@ -79,7 +79,7 @@
         <script type="text/javascript">
             $(function(){
                 //チェックボックス押下処理
-                $('#todo_li input').click(function () {
+                $('input[name^="task_"').click(function () {
                     $.ajax({
                         url:'./changedone',
                         type:'POST',
@@ -114,10 +114,12 @@
                 });
 
                 //タスク編集処理
-                $('#todo_li label').click(function () {
+                $('label[name^="task_title"').click(function () {
+                    let id = $(this).attr('name').split("_")[2];
                     
                     console.log($(this));
-                    $("#modal_task_id").val($(this).attr('name').split("_")[1]);
+                    console.log("hidden要素にidを設定します。id: " + id);
+                    $("#modal_task_id").val(id);
                     $("#modal-title").val($(this).text());
 
                     $(this).blur();	//ボタンからフォーカスを外す
@@ -145,7 +147,7 @@
                             'id': id,
                         }
                     });
-                    $(this).parent().remove();
+                    $(this).parents("tr").remove();
                 });
 
             });
